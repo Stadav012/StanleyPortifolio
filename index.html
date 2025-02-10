@@ -32,9 +32,107 @@
 
 	<!-- Theme style  -->
 	<link rel="stylesheet" href="css/style.css">
-
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+	<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+	
+	<style>
+		/* Custom cursor */
+		* {
+			cursor: none !important;
+		}
+		
+		.cursor {
+			width: 24px;
+			height: 24px;
+			position: fixed;
+			pointer-events: none;
+			z-index: 9999;
+			mix-blend-mode: difference;
+			transition: transform 0.2s ease, border-color 0.3s ease;
+			backdrop-filter: invert(1);
+		}
+		
+		.cursor-dot {
+			width: 4px;
+			height: 4px;
+			background-color: var(--cursor-color, #ffffff);
+			border-radius: 50%;
+			position: fixed;
+			pointer-events: none;
+			z-index: 9999;
+			mix-blend-mode: difference;
+			transition: transform 0.1s ease;
+		}
 
+		.trail {
+			position: fixed;
+			width: 10px;
+			height: 10px;
+			background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+			border-radius: 50%;
+			pointer-events: none;
+			z-index: 9998;
+			opacity: 0;
+			animation: trail-fade 0.8s ease-out;
+		}
+
+		@keyframes trail-fade {
+			0% {
+				opacity: 0.8;
+				transform: scale(1);
+			}
+			100% {
+				opacity: 0;
+				transform: scale(0.3);
+			}
+		}
+
+		#character-container {
+			position: fixed;
+			bottom: 40px;
+			right: 40px;
+			width: 200px;
+			height: 200px;
+			z-index: 1000;
+			pointer-events: none;
+		}
+
+		#water-container {
+			position: fixed;
+			left: 20px;
+			top: 0;
+			bottom: 0;
+			width: 150px;
+			pointer-events: none;
+			z-index: 999;
+		}
+
+		.water-particle {
+			position: absolute;
+			background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+			border-radius: 50%;
+			pointer-events: none;
+			opacity: 0;
+			animation: droplet 3s ease-in infinite;
+		}
+
+		@keyframes droplet {
+			0% {
+				opacity: 0;
+				transform: translateY(-100%) scale(0.3);
+			}
+			50% {
+				opacity: 0.5;
+				transform: translateY(50vh) scale(1);
+			}
+			100% {
+				opacity: 0;
+				transform: translateY(100vh) scale(0.3);
+			}
+		}
+	</style>
 	<!-- Modernizr JS -->
 	<script src="js/modernizr-2.6.2.min.js"></script>
 	<!-- FOR IE9 below -->
@@ -44,7 +142,10 @@
 
 	</head>
 	<body>
-
+	<div class="cursor"></div>
+	<div class="cursor-dot"></div>
+	<div id="character-container"></div>
+	<div id="water-container"></div>
 	<div class="fh5co-loader"></div>
 
 	<div id="page">
@@ -55,22 +156,24 @@
 				<div class="col-md-8 col-md-offset-2 text-center">
 					<div class="display-t js-fullheight">
 						<div class="display-tc js-fullheight animate-box" data-animate-effect="fadeIn">
-							<div class="profile-thumb" style="background: url(images/user-3.jpeg);"></div>
-							<h1><span>Stanley Tulani Ndlovu</span></h1>
-							<h3><span>Developer / Techpreneur</span></h3>
-							<p>
-								<ul class="fh5co-social-icons">
-									<li><a href="https://www.linkedin.com/in/stanleynpy/"><i class="icon-linkedin2"></i></a></li>
-									<li><a href="https://github.com/Stadav012"><i class="icon-github2"></i></a></li>
-								</ul>
-							</p>
+							<!-- Profile section -->
+								<div class="profile-thumb" style="background: url(images/user-3.jpeg);" data-aos="fade-down"></div>
+								<h1><span data-aos="fade-up" data-aos-delay="100">Stanley Tulani Ndlovu</span></h1>
+								<h3><span data-aos="fade-up" data-aos-delay="200">Developer / Techpreneur</span></h3>
+								<p data-aos="fade-up" data-aos-delay="300">
+									<ul class="fh5co-social-icons">
+										<li><a href="https://www.linkedin.com/in/stanleynpy/"><i class="icon-linkedin2"></i></a></li>
+										<li><a href="https://github.com/Stadav012"><i class="icon-github2"></i></a></li>
+									</ul>
+								</p>
 
-							<a href="#portfolio-section" class="mouse-wrap smoothscroll">
-								<span class="mouse">
-								  <span class="scroll"></span>
-								</span>
-								<span class="mouse-label">Scroll</span>
-							  </a>
+								<a href="#portfolio-section" class="mouse-wrap smoothscroll">
+									<span class="mouse">
+									  <span class="scroll"></span>
+									</span>
+									<span class="mouse-label">Scroll</span>
+								  </a>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -344,15 +447,65 @@
 						</div>
 					</div>
 					<div class="progress-wrap">
-						<h3><span class="name-left">Framer</span><span class="value-right">90%</span></h3>
+						<h3><span class="name-left">Python</span><span class="value-right">95%</span></h3>
 						<div class="progress">
 							<div class="progress-bar progress-bar-2 progress-bar-striped active" role="progressbar"
+								aria-valuenow="95" aria-valuemin="0" aria-valuemax="100" style="width:95%">
+							</div>
+						</div>
+					</div>
+					<div class="progress-wrap">
+						<h3><span class="name-left">JavaScript</span><span class="value-right">85%</span></h3>
+						<div class="progress">
+							<div class="progress-bar progress-bar-3 progress-bar-striped active" role="progressbar"
+								aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width:85%">
+							</div>
+						</div>
+					</div>
+					<div class="progress-wrap">
+						<h3><span class="name-left">Machine Learning</span><span class="value-right">90%</span></h3>
+						<div class="progress">
+							<div class="progress-bar progress-bar-4 progress-bar-striped active" role="progressbar"
 								aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width:90%">
 							</div>
 						</div>
 					</div>
 					<div class="progress-wrap">
-						<h3><span class="name-left">PHP</span><span class="value-right">80%</span></h3>
+						<h3><span class="name-left">Artificial Intelligence</span><span class="value-right">85%</span></h3>
+						<div class="progress">
+							<div class="progress-bar progress-bar-5 progress-bar-striped active" role="progressbar"
+								aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width:85%">
+							</div>
+						</div>
+					</div>
+					<div class="progress-wrap">
+						<h3><span class="name-left">Team Leadership</span><span class="value-right">90%</span></h3>
+						<div class="progress">
+							<div class="progress-bar progress-bar-6 progress-bar-striped active" role="progressbar"
+								aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width:90%">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="progress-wrap">
+						<h3><span class="name-left">Natural Language Processing</span><span class="value-right">85%</span></h3>
+						<div class="progress">
+							<div class="progress-bar progress-bar-1 progress-bar-striped active" role="progressbar"
+								aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width:85%">
+							</div>
+						</div>
+					</div>
+					<div class="progress-wrap">
+						<h3><span class="name-left">Java</span><span class="value-right">85%</span></h3>
+						<div class="progress">
+							<div class="progress-bar progress-bar-2 progress-bar-striped active" role="progressbar"
+								aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width:85%">
+							</div>
+						</div>
+					</div>
+					<div class="progress-wrap">
+						<h3><span class="name-left">React</span><span class="value-right">80%</span></h3>
 						<div class="progress">
 							<div class="progress-bar progress-bar-3 progress-bar-striped active" role="progressbar"
 								aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width:80%">
@@ -360,15 +513,15 @@
 						</div>
 					</div>
 					<div class="progress-wrap">
-						<h3><span class="name-left">Java</span><span class="value-right">85%</span></h3>
+						<h3><span class="name-left">IoT Development</span><span class="value-right">80%</span></h3>
 						<div class="progress">
 							<div class="progress-bar progress-bar-4 progress-bar-striped active" role="progressbar"
-								aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width:85%">
+								aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width:80%">
 							</div>
 						</div>
 					</div>
 					<div class="progress-wrap">
-						<h3><span class="name-left">Python</span><span class="value-right">95%</span></h3>
+						<h3><span class="name-left">Project Management</span><span class="value-right">95%</span></h3>
 						<div class="progress">
 							<div class="progress-bar progress-bar-5 progress-bar-striped active" role="progressbar"
 								aria-valuenow="95" aria-valuemin="0" aria-valuemax="100" style="width:95%">
@@ -380,48 +533,6 @@
 						<div class="progress">
 							<div class="progress-bar progress-bar-6 progress-bar-striped active" role="progressbar"
 								aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:70%">
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-6">
-					<div class="progress-wrap">
-						<h3><span class="name-left">jQuery</span><span class="value-right">75%</span></h3>
-						<div class="progress">
-							<div class="progress-bar progress-bar-4 progress-bar-striped active" role="progressbar"
-								aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width:75%">
-							</div>
-						</div>
-					</div>
-					<div class="progress-wrap">
-						<h3><span class="name-left">Design</span><span class="value-right">100%</span></h3>
-						<div class="progress">
-							<div class="progress-bar progress-bar-2 progress-bar-striped active" role="progressbar"
-								aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-							</div>
-						</div>
-					</div>
-					<div class="progress-wrap">
-						<h3><span class="name-left">JavaScript</span><span class="value-right">85%</span></h3>
-						<div class="progress">
-							<div class="progress-bar progress-bar-1 progress-bar-striped active" role="progressbar"
-								aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width:85%">
-							</div>
-						</div>
-					</div>
-					<div class="progress-wrap">
-						<h3><span class="name-left">React</span><span class="value-right">80%</span></h3>
-						<div class="progress">
-							<div class="progress-bar progress-bar-2 progress-bar-striped active" role="progressbar"
-								aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width:80%">
-							</div>
-						</div>
-					</div>
-					<div class="progress-wrap">
-						<h3><span class="name-left">Bootstrap</span><span class="value-right">85%</span></h3>
-						<div class="progress">
-							<div class="progress-bar progress-bar-5 progress-bar-striped active" role="progressbar"
-								aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="width:85%">
 							</div>
 						</div>
 					</div>
@@ -440,7 +551,7 @@
 			</div>
 			<div class="row">
 				<div class="col-md-3 text-center col-padding animate-box">
-					<a href="https://edutecx.com" class="work" style="background-image: url(images/portfolio-1.png);">
+					<a href="https://edutecx.com" class="work" style="background-image: url(images/portfolio-1.png);" data-aos="zoom-in">
 						<div class="desc">
 							<h3>EduTecX Website</h3>
 							<span>Web Development</span>
@@ -581,7 +692,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
-					<p>&copy; 2024 Stanley Tulani Ndlovu. All Rights Reserved. </p>
+					<p>&copy; 2025 Stanley Tulani Ndlovu. All Rights Reserved. </p>
 				</div>
 			</div>
 		</div>
@@ -609,6 +720,140 @@
 
 	<!-- Main -->
 	<script src="js/main.js"></script>
+	<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+	<script>
+		AOS.init({
+			duration: 1000,
+			once: false,
+			mirror: true
+		});
 
-	</body>
+		// Cursor and trail effects
+		const cursor = document.querySelector('.cursor');
+		const cursorDot = document.querySelector('.cursor-dot');
+		let trails = [];
+
+		document.addEventListener('mousemove', (e) => {
+			cursor.style.left = e.clientX + 'px';
+			cursor.style.top = e.clientY + 'px';
+			cursorDot.style.left = e.clientX + 'px';
+			cursorDot.style.top = e.clientY + 'px';
+
+			// Create trail
+			const trail = document.createElement('div');
+			trail.className = 'trail';
+			trail.style.left = e.clientX + 'px';
+			trail.style.top = e.clientY + 'px';
+			document.body.appendChild(trail);
+			trails.push(trail);
+
+			// Remove old trails
+			if (trails.length > 20) {
+				trails[0].remove();
+				trails.shift();
+			}
+
+			// Cleanup trails after animation
+			setTimeout(() => {
+				trail.remove();
+				trails = trails.filter(t => t !== trail);
+			}, 500);
+		});
+
+		// Cursor effects on interactive elements
+		document.querySelectorAll('a, button, .btn, input, textarea').forEach(elem => {
+			elem.addEventListener('mouseenter', () => {
+				cursor.style.transform = 'scale(1.5)';
+				cursor.style.setProperty('--cursor-color', '#00ff00');
+			});
+			elem.addEventListener('mouseleave', () => {
+				cursor.style.transform = 'scale(1)';
+				cursor.style.setProperty('--cursor-color', '#ffffff');
+			});
+		});
+
+		// 3D Character
+		const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+		const renderer = new THREE.WebGLRenderer({ 
+			alpha: true,
+			antialias: true 
+		});
+		renderer.setSize(200, 200);
+		document.getElementById('character-container').appendChild(renderer.domElement);
+
+		// Add lighting
+		const ambientLight = new THREE.AmbientLight(0x404040);
+		scene.add(ambientLight);
+		
+		const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+		directionalLight.position.set(1, 1, 1);
+		scene.add(directionalLight);
+
+		// Create improved character
+		const geometry = new THREE.IcosahedronGeometry(1, 0);
+		const material = new THREE.MeshPhongMaterial({ 
+			color: 0x2F4F4F, // Dark blue-grey color
+			shininess: 80,
+			specular: 0x333333,
+			flatShading: true
+		});
+		const cube = new THREE.Mesh(geometry, material);
+		scene.add(cube);
+		camera.position.z = 3;
+
+		// Enhanced animation
+		function animate() {
+			requestAnimationFrame(animate);
+			cube.rotation.x += 0.01;
+			cube.rotation.y += 0.02;
+			cube.rotation.z += 0.005;
+			renderer.render(scene, camera);
+		}
+		animate();
+
+		// Smoother scroll following
+		let currentY = 0;
+		let targetY = 0;
+
+		window.addEventListener('scroll', () => {
+			const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+			targetY = -scrollPercent * 3;
+		});
+
+		function updatePosition() {
+			currentY += (targetY - currentY) * 0.1;
+			cube.position.y = currentY;
+			requestAnimationFrame(updatePosition);
+		}
+		updatePosition();
+
+		// Water droplet effect
+		function createWaterDroplet() {
+			const droplet = document.createElement('div');
+			droplet.className = 'water-particle';
+			droplet.style.left = Math.random() * 100 + 'px';
+			droplet.style.width = Math.random() * 8 + 4 + 'px';
+			droplet.style.height = droplet.style.width;
+			
+			document.getElementById('water-container').appendChild(droplet);
+
+			droplet.addEventListener('animationend', () => {
+				droplet.remove();
+			});
+		}
+
+		// Create droplets at random intervals
+		function startWaterEffect() {
+			setInterval(() => {
+				if (Math.random() > 0.7) { // 30% chance to create a droplet
+					createWaterDroplet();
+				}
+			}, 200);
+		}
+
+		startWaterEffect();
+	</script>
+	</head>
+	<body>
 </html>
