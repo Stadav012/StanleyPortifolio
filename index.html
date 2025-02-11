@@ -99,39 +99,68 @@
 			pointer-events: none;
 		}
 
-		#water-container {
-			position: fixed;
-			left: 20px;
-			top: 0;
-			bottom: 0;
-			width: 150px;
-			pointer-events: none;
-			z-index: 999;
-		}
+		#journey-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999;
+        opacity: 0.8;
+    }
 
-		.water-particle {
-			position: absolute;
-			background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
-			border-radius: 50%;
-			pointer-events: none;
-			opacity: 0;
-			animation: droplet 3s ease-in infinite;
-		}
+    @media screen and (max-width: 768px) {
+        #journey-container {
+            opacity: 0.4;
+        }
+    }
 
-		@keyframes droplet {
-			0% {
-				opacity: 0;
-				transform: translateY(-100%) scale(0.3);
-			}
-			50% {
-				opacity: 0.5;
-				transform: translateY(50vh) scale(1);
-			}
-			100% {
-				opacity: 0;
-				transform: translateY(100vh) scale(0.3);
-			}
-		}
+	.space-transition {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 9997;
+    }
+
+    .stars-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        perspective: 600px;
+        overflow: hidden;
+    }
+
+    .star {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: #fff;
+        border-radius: 50%;
+    }
+
+    .warp-effect {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at center, transparent 0%, #000 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+    }
+
+    .warp-active .warp-effect {
+        opacity: 1;
+    }
+
+    .space-active {
+        opacity: 1;
+    }
 	</style>
 	<!-- Modernizr JS -->
 	<script src="js/modernizr-2.6.2.min.js"></script>
@@ -145,7 +174,7 @@
 	<div class="cursor"></div>
 	<div class="cursor-dot"></div>
 	<div id="character-container"></div>
-	<div id="water-container"></div>
+	<div id="journey-container"></div>
 	<div class="fh5co-loader"></div>
 
 	<div id="page">
@@ -180,6 +209,11 @@
 			</div>
 		</div>
 	</header>
+
+	<div id="space-transition" class="space-transition">
+		<div id="stars-container" class="stars-container"></div>
+		<div id="warp-effect" class="warp-effect"></div>
+	</div>
 
 	<div id="fh5co-about" class="animate-box">
 		<div class="container">
@@ -649,39 +683,45 @@
 		</div>
 		<div class="choose animate-box">
 			<h2>Contact</h2>
-			<form action="#">
-				<div class="row form-group">
-					<div class="col-md-6">
-						<input type="text" id="fname" class="form-control" placeholder="firstname">
-					</div>
+			<form action="#" class="modern-form">
+				<div class="form-group-modern">
+					<input type="text" id="fname" required>
+					<label for="fname">First Name</label>
+					<span class="focus-border"></span>
 				</div>
-				<div class="row form-group">
-					<div class="col-md-6">
-						<input type="text" id="lname" class="form-control" placeholder="lastname">
-					</div>
+	
+				<div class="form-group-modern">
+					<input type="text" id="lname" required>
+					<label for="lname">Last Name</label>
+					<span class="focus-border"></span>
 				</div>
-
-				<div class="row form-group">
-					<div class="col-md-12">
-						<input type="text" id="email" class="form-control" placeholder="email address">
-					</div>
+	
+				<div class="form-group-modern">
+					<input type="email" id="email" required>
+					<label for="email">Email Address</label>
+					<span class="focus-border"></span>
 				</div>
-
-				<div class="row form-group">
-					<div class="col-md-12">
-						<input type="text" id="subject" class="form-control" placeholder="subject of this message">
-					</div>
+	
+				<div class="form-group-modern">
+					<input type="text" id="subject" required>
+					<label for="subject">Subject</label>
+					<span class="focus-border"></span>
 				</div>
-
-				<div class="row form-group">
-					<div class="col-md-12">
-						<textarea name="message" id="message" cols="30" rows="10" class="form-control" placeholder="message"></textarea>
-					</div>
+	
+				<div class="form-group-modern">
+					<textarea id="message" required></textarea>
+					<label for="message">Message</label>
+					<span class="focus-border"></span>
 				</div>
-				<div class="form-group">
-					<input type="submit" value="Send Message" class="btn btn-primary">
+	
+				<div class="form-group-modern">
+					<button type="submit" class="modern-button">
+						<span>Send Message</span>
+						<svg class="send-icon" viewBox="0 0 24 24">
+							<path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"></path>
+						</svg>
+					</button>
 				</div>
-
 			</form>
 		</div>
 	</div>
@@ -853,6 +893,37 @@
 		}
 
 		startWaterEffect();
+
+		// Remove water effect code and add particle effect
+		function createParticle() {
+			const particle = document.createElement('div');
+			particle.className = 'particle';
+			
+			// Random size between 3 and 6 pixels
+			const size = Math.random() * 3 + 3;
+			particle.style.width = `${size}px`;
+			particle.style.height = `${size}px`;
+			
+			// Position randomly along the left side
+			particle.style.left = `${Math.random() * 100}px`;
+			particle.style.top = `${Math.random() * 100}%`;
+			
+			document.getElementById('particle-container').appendChild(particle);
+
+			particle.addEventListener('animationend', () => {
+				particle.remove();
+			});
+		}
+
+		function startParticleEffect() {
+			setInterval(() => {
+				if (Math.random() > 0.8) {
+					createParticle();
+				}
+			}, 300);
+		}
+
+		startParticleEffect();
 	</script>
 	</head>
 	<body>
@@ -918,62 +989,323 @@
         pointer-events: none;
     }
 
-    #water-container {
+    /* Remove old particle and water styles */
+    #dna-container {
         position: fixed;
-        left: 20px;
-        top: 0;
         bottom: 0;
-        width: 150px;
+        right: 0;
+        width: 300px;
+        height: 100vh;
         pointer-events: none;
         z-index: 999;
+        opacity: 0.7;
     }
 
-    .water-particle {
+    @media screen and (max-width: 768px) {
+        #dna-container {
+            width: 150px;
+            opacity: 0.4;
+        }
+    }
+
+	.modern-form {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form-group-modern {
+        position: relative;
+        margin-bottom: 35px;
+    }
+
+    .form-group-modern input,
+    .form-group-modern textarea {
+        width: 100%;
+        padding: 15px 0;
+        font-size: 16px;
+        color: #333;
+        border: none;
+        border-bottom: 1px solid #ddd;
+        outline: none;
+        background: transparent;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group-modern label {
         position: absolute;
-        background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
-        border-radius: 50%;
+        top: 15px;
+        left: 0;
+        font-size: 16px;
+        color: #999;
         pointer-events: none;
-        opacity: 0;
-        animation: droplet 3s ease-in infinite;
+        transition: all 0.3s ease;
     }
 
-    @keyframes droplet {
-        0% {
-            opacity: 0;
-            transform: translateY(-100%) scale(0.3);
-        }
-        50% {
-            opacity: 0.5;
-            transform: translateY(50vh) scale(1);
-        }
-        100% {
-            opacity: 0;
-            transform: translateY(100vh) scale(0.3);
-        }
+    .form-group-modern input:focus ~ label,
+    .form-group-modern textarea:focus ~ label,
+    .form-group-modern input:valid ~ label,
+    .form-group-modern textarea:valid ~ label {
+        top: -10px;
+        font-size: 12px;
+        color: #2c98f0;
+    }
+
+    .focus-border {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: #2c98f0;
+        transition: width 0.3s ease;
+    }
+
+    .form-group-modern input:focus ~ .focus-border,
+    .form-group-modern textarea:focus ~ .focus-border {
+        width: 100%;
+    }
+
+    .modern-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px 40px;
+        background: #2c98f0;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        gap: 10px;
+    }
+
+    .modern-button:hover {
+        background: #2176bc;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(44, 152, 240, 0.3);
+    }
+
+    .send-icon {
+        width: 20px;
+        height: 20px;
+        fill: currentColor;
+        transition: transform 0.3s ease;
+    }
+
+    .modern-button:hover .send-icon {
+        transform: translateX(5px);
+    }
+
+    .form-group-modern textarea {
+        min-height: 120px;
+        resize: vertical;
     }
 </style>
 
-<!-- Update the scroll button HTML structure -->
-<div class="display-tc js-fullheight animate-box" data-animate-effect="fadeIn">
-    <!-- Profile section -->
-        <div class="profile-thumb" style="background: url(images/user-3.jpeg);" data-aos="fade-down"></div>
-        <h1><span data-aos="fade-up" data-aos-delay="100">Stanley Tulani Ndlovu</span></h1>
-        <h3><span data-aos="fade-up" data-aos-delay="200">Developer / Techpreneur</span></h3>
-        <p data-aos="fade-up" data-aos-delay="300">
-            <ul class="fh5co-social-icons">
-                <li><a href="https://www.linkedin.com/in/stanleynpy/"><i class="icon-linkedin2"></i></a></li>
-                <li><a href="https://github.com/Stadav012"><i class="icon-github2"></i></a></li>
-            </ul>
-        </p>
+<script>
+	// ... existing code ...
+	
+	// Space transition effect
+	const spaceTransition = document.getElementById('space-transition');
+	const starsContainer = document.getElementById('stars-container');
+	const warpEffect = document.getElementById('warp-effect');
+	let lastScrollTop = 0;
+	let isTransitioning = false;
+	
+	// Create stars
+	function createStars(count) {
+		for (let i = 0; i < count; i++) {
+			const star = document.createElement('div');
+			star.className = 'star';
+			star.style.left = `${Math.random() * 100}%`;
+			star.style.top = `${Math.random() * 100}%`;
+			star.style.transform = `translateZ(${Math.random() * 400 - 200}px)`;
+			starsContainer.appendChild(star);
+		}
+	}
+	
+	// Initialize stars
+	createStars(200);
 
-        <div class="mouse-wrap smoothscroll">
-            <a href="#portfolio-section" class="mouse-label">
-                <div class="mouse">
-                    <div class="scroll"></div>
-                </div>
-                Scroll
-            </a>
-        </div>
-</div>
+	let isSpaceTransitioning = false;
+    let targetSection = null;
+	
+	// Handle scroll transition
+	window.addEventListener('scroll', () => {
+		const headerHeight = document.querySelector('#fh5co-header').offsetHeight;
+		const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+		
+		if (scrollTop < headerHeight) {
+			const progress = scrollTop / headerHeight;
+			
+			if (progress > 0 && progress < 0.9) {
+				spaceTransition.classList.add('space-active');
+				
+				// Add warp effect when scrolling down
+				if (scrollTop > lastScrollTop) {
+					spaceTransition.classList.add('warp-active');
+				} else {
+					spaceTransition.classList.remove('warp-active');
+				}
+				
+				// Animate stars based on scroll
+				const stars = document.querySelectorAll('.star');
+				stars.forEach(star => {
+					const z = parseFloat(star.style.transform.match(/translateZ\((.*?)px\)/)[1]);
+					const newZ = z - (scrollTop > lastScrollTop ? 10 : -10);
+					star.style.transform = `translateZ(${newZ}px)`;
+				});
+			} else {
+				spaceTransition.classList.remove('space-active');
+				spaceTransition.classList.remove('warp-active');
+			}
+		}
+		
+		lastScrollTop = scrollTop;
+	});
+	
+	// Reset stars positions periodically
+	setInterval(() => {
+		if (!spaceTransition.classList.contains('space-active')) {
+			const stars = document.querySelectorAll('.star');
+			stars.forEach(star => {
+				star.style.transform = `translateZ(${Math.random() * 400 - 200}px)`;
+			});
+		}
+	}, 5000);
+	</script>
+
+<!-- Update the JavaScript animation -->
+<script>
+    // Paper plane journey animation
+    const journeyContainer = document.getElementById('journey-container');
+    const journeyScene = new THREE.Scene();
+    const journeyCamera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const journeyRenderer = new THREE.WebGLRenderer({ 
+        alpha: true,
+        antialias: true 
+    });
+    journeyRenderer.setSize(window.innerWidth, window.innerHeight);
+    journeyContainer.appendChild(journeyRenderer.domElement);
+
+// Create a simple but elegant floating shape
+const planeShape = new THREE.Group();
+
+// Create main body using a cone
+const bodyGeometry = new THREE.ConeGeometry(0.5, 2, 4);  // radius, height, segments
+const bodyMaterial = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    shininess: 100,
+    transparent: true,
+    opacity: 0.9,
+    side: THREE.DoubleSide
+});
+const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+
+// Create a ring around the shape
+const ringGeometry = new THREE.TorusGeometry(0.8, 0.05, 16, 32);
+const ringMaterial = new THREE.MeshPhongMaterial({
+    color: 0x00ffff,
+    shininess: 90,
+    transparent: true,
+    opacity: 0.5
+});
+const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+
+// Position and rotate elements
+body.rotation.x = Math.PI / 2;
+ring.rotation.x = Math.PI / 2;
+
+planeShape.add(body);
+planeShape.add(ring);
+
+// Add glow effect
+const glowGeometry = new THREE.SphereGeometry(1, 32, 32);
+const glowMaterial = new THREE.MeshPhongMaterial({
+    color: 0x0088ff,
+    transparent: true,
+    opacity: 0.2,
+    side: THREE.BackSide
+});
+const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+planeShape.add(glow);
+
+// Scale and add to scene
+planeShape.scale.set(1, 1, 1);
+journeyScene.add(planeShape);
+
+    // Create wider path points for the journey
+    const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-30, -5, 0),
+        new THREE.Vector3(-20, 2, -5),
+        new THREE.Vector3(-10, 5, -3),
+        new THREE.Vector3(0, 2, -5),
+        new THREE.Vector3(10, 0, -2),
+        new THREE.Vector3(20, 3, -4),
+        new THREE.Vector3(30, 1, -3)
+    ]);
+
+    // Add subtle stars in background
+    const starsGeometry = new THREE.BufferGeometry();
+    const starsMaterial = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.1,
+        transparent: true,
+        opacity: 0.5
+    });
+
+    const starsVertices = [];
+    for(let i = 0; i < 1000; i++) {
+        starsVertices.push(
+            Math.random() * 200 - 100,
+            Math.random() * 200 - 100,
+            Math.random() * 200 - 100
+        );
+    }
+    starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+    const stars = new THREE.Points(starsGeometry, starsMaterial);
+    journeyScene.add(stars);
+
+    // Lighting
+    const journeyAmbientLight = new THREE.AmbientLight(0x404040);
+    const journeyPointLight = new THREE.PointLight(0xffffff, 1);
+    journeyPointLight.position.set(10, 10, 10);
+    journeyScene.add(journeyAmbientLight);
+    journeyScene.add(journeyPointLight);
+
+    journeyCamera.position.z = 20;
+
+    // Animation
+    let progress = 0;
+    function animateJourney() {
+        requestAnimationFrame(animateJourney);
+        
+        progress += 0.001;
+        if(progress > 1) progress = 0;
+
+        const point = curve.getPoint(progress);
+        const nextPoint = curve.getPoint((progress + 0.01) % 1);
+        
+        planeShape.position.copy(point);
+        planeShape.lookAt(nextPoint);
+        planeShape.rotateY(Math.PI / 2); // Adjust orientation
+        
+        // Add slight wobble
+        planeShape.rotation.z = Math.sin(Date.now() * 0.002) * 0.1;
+
+        stars.rotation.y += 0.0003;
+        
+        journeyRenderer.render(journeyScene, journeyCamera);
+    }
+    animateJourney();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        journeyCamera.aspect = window.innerWidth/window.innerHeight;
+        journeyCamera.updateProjectionMatrix();
+        journeyRenderer.setSize(window.innerWidth, window.innerHeight);
+    });
+</script>
 	</body>
 </html>
