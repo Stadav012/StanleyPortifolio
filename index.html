@@ -856,4 +856,124 @@
 	</script>
 	</head>
 	<body>
+<style>
+    /* Custom cursor */
+    * {
+        cursor: none !important;
+    }
+    
+    .cursor {
+        width: 24px;
+        height: 24px;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        mix-blend-mode: difference;
+        transition: transform 0.2s ease, border-color 0.3s ease;
+        backdrop-filter: invert(1);
+    }
+    
+    .cursor-dot {
+        width: 4px;
+        height: 4px;
+        background-color: var(--cursor-color, #ffffff);
+        border-radius: 50%;
+        position: fixed;
+        pointer-events: none;
+        z-index: 9999;
+        mix-blend-mode: difference;
+        transition: transform 0.1s ease;
+    }
+
+    .trail {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        opacity: 0;
+        animation: trail-fade 0.8s ease-out;
+    }
+
+    @keyframes trail-fade {
+        0% {
+            opacity: 0.8;
+            transform: scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+    }
+
+    #character-container {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        width: 200px;
+        height: 200px;
+        z-index: 1000;
+        pointer-events: none;
+    }
+
+    #water-container {
+        position: fixed;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 150px;
+        pointer-events: none;
+        z-index: 999;
+    }
+
+    .water-particle {
+        position: absolute;
+        background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0;
+        animation: droplet 3s ease-in infinite;
+    }
+
+    @keyframes droplet {
+        0% {
+            opacity: 0;
+            transform: translateY(-100%) scale(0.3);
+        }
+        50% {
+            opacity: 0.5;
+            transform: translateY(50vh) scale(1);
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(100vh) scale(0.3);
+        }
+    }
+</style>
+
+<!-- Update the scroll button HTML structure -->
+<div class="display-tc js-fullheight animate-box" data-animate-effect="fadeIn">
+    <!-- Profile section -->
+        <div class="profile-thumb" style="background: url(images/user-3.jpeg);" data-aos="fade-down"></div>
+        <h1><span data-aos="fade-up" data-aos-delay="100">Stanley Tulani Ndlovu</span></h1>
+        <h3><span data-aos="fade-up" data-aos-delay="200">Developer / Techpreneur</span></h3>
+        <p data-aos="fade-up" data-aos-delay="300">
+            <ul class="fh5co-social-icons">
+                <li><a href="https://www.linkedin.com/in/stanleynpy/"><i class="icon-linkedin2"></i></a></li>
+                <li><a href="https://github.com/Stadav012"><i class="icon-github2"></i></a></li>
+            </ul>
+        </p>
+
+        <div class="mouse-wrap smoothscroll">
+            <a href="#portfolio-section" class="mouse-label">
+                <div class="mouse">
+                    <div class="scroll"></div>
+                </div>
+                Scroll
+            </a>
+        </div>
+</div>
+	</body>
 </html>
