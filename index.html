@@ -36,6 +36,8 @@
 	<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+	<!-- Add this in the head section -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 	
 	<style>
 		/* Custom cursor */
@@ -683,37 +685,38 @@
 		</div>
 		<div class="choose animate-box">
 			<h2>Contact</h2>
-			<form action="#" class="modern-form">
+			<!-- Update the form section -->
+			<form id="contactForm" class="modern-form">
 				<div class="form-group-modern">
-					<input type="text" id="fname" required>
+					<input type="text" id="fname" name="fname" required>
 					<label for="fname">First Name</label>
 					<span class="focus-border"></span>
 				</div>
-	
+
 				<div class="form-group-modern">
-					<input type="text" id="lname" required>
+					<input type="text" id="lname" name="lname" required>
 					<label for="lname">Last Name</label>
 					<span class="focus-border"></span>
 				</div>
-	
+
 				<div class="form-group-modern">
-					<input type="email" id="email" required>
+					<input type="email" id="email" name="email" required>
 					<label for="email">Email Address</label>
 					<span class="focus-border"></span>
 				</div>
-	
+
 				<div class="form-group-modern">
-					<input type="text" id="subject" required>
+					<input type="text" id="subject" name="subject" required>
 					<label for="subject">Subject</label>
 					<span class="focus-border"></span>
 				</div>
-	
+
 				<div class="form-group-modern">
-					<textarea id="message" required></textarea>
+					<textarea id="message" name="message" required></textarea>
 					<label for="message">Message</label>
 					<span class="focus-border"></span>
 				</div>
-	
+
 				<div class="form-group-modern">
 					<button type="submit" class="modern-button">
 						<span>Send Message</span>
@@ -761,6 +764,53 @@
 	<!-- Main -->
 	<script src="js/main.js"></script>
 	<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+	<script type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+	<script type="text/javascript">
+		// Initialize EmailJS with your user ID
+		emailjs.init('xUTDIfIWmBR9A9AA9')
+	
+		document.getElementById('contactForm').addEventListener('submit', function(event) {
+			event.preventDefault();
+	
+			// Show sending indicator
+			const button = this.querySelector('button');
+			const originalText = button.innerHTML;
+			button.innerHTML = '<span>Sending...</span>';
+			button.disabled = true;
+	
+			// Prepare the email parameters
+			const templateParams = {
+				from_name: `${this.fname.value} ${this.lname.value}`,
+				from_email: this.email.value,
+				subject: this.subject.value,
+				message: this.message.value,
+				to_name: 'Stanley Tulani Ndlovu',
+			};
+	
+			// Send the email
+			emailjs.send('service_st0aycx', 'template_ltmnisu', templateParams)
+				.then(function() {
+					// Show success message
+					button.innerHTML = '<span>Message Sent!</span>';
+					setTimeout(() => {
+						button.innerHTML = originalText;
+						button.disabled = false;
+					}, 3000);
+					
+					// Clear the form
+					document.getElementById('contactForm').reset();
+				}, function(error) {
+					// Show error message
+					button.innerHTML = '<span>Failed to send</span>';
+					console.error('Failed to send message:', error);
+					setTimeout(() => {
+						button.innerHTML = originalText;
+						button.disabled = false;
+					}, 3000);
+				});
+		});
+	</script>
 	<script>
 		AOS.init({
 			duration: 1000,
@@ -867,63 +917,6 @@
 			requestAnimationFrame(updatePosition);
 		}
 		updatePosition();
-
-		// Water droplet effect
-		function createWaterDroplet() {
-			const droplet = document.createElement('div');
-			droplet.className = 'water-particle';
-			droplet.style.left = Math.random() * 100 + 'px';
-			droplet.style.width = Math.random() * 8 + 4 + 'px';
-			droplet.style.height = droplet.style.width;
-			
-			document.getElementById('water-container').appendChild(droplet);
-
-			droplet.addEventListener('animationend', () => {
-				droplet.remove();
-			});
-		}
-
-		// Create droplets at random intervals
-		function startWaterEffect() {
-			setInterval(() => {
-				if (Math.random() > 0.7) { // 30% chance to create a droplet
-					createWaterDroplet();
-				}
-			}, 200);
-		}
-
-		startWaterEffect();
-
-		// Remove water effect code and add particle effect
-		function createParticle() {
-			const particle = document.createElement('div');
-			particle.className = 'particle';
-			
-			// Random size between 3 and 6 pixels
-			const size = Math.random() * 3 + 3;
-			particle.style.width = `${size}px`;
-			particle.style.height = `${size}px`;
-			
-			// Position randomly along the left side
-			particle.style.left = `${Math.random() * 100}px`;
-			particle.style.top = `${Math.random() * 100}%`;
-			
-			document.getElementById('particle-container').appendChild(particle);
-
-			particle.addEventListener('animationend', () => {
-				particle.remove();
-			});
-		}
-
-		function startParticleEffect() {
-			setInterval(() => {
-				if (Math.random() > 0.8) {
-					createParticle();
-				}
-			}, 300);
-		}
-
-		startParticleEffect();
 	</script>
 	</head>
 	<body>
